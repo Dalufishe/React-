@@ -131,13 +131,36 @@
  * $ 狀態(State)
  * * 因應"聲明式設計"而生
  * * 狀態, 為組件描述某種顯示情況的"數據", 由組件自己透過狀態自動設置和更改顯示情況(也就是說由組件自己去維護), 在不同的狀態會使組件的顯示不同
- * * 不同於 Vue, React的聲明式設計並沒有使用底層變數攔截 => 而是使用狀態特性(state)儲存狀態, 並透過 setState()來設定新的狀態, 並告訴 React狀態改變並該渲染了
- * * [註]: 不能直接修改state(無法被攔截判斷修改), 必須間接修改使用setState()告知React該渲染了
+ * * 不同於 Vue, React的聲明式設計並沒有使用底層變數攔截 => 需手動告知 React渲染時機
+ * ? state物件, setState()方法
+ * * 使用狀態特性(state)儲存狀態(推薦), 並透過 setState()來設定新的狀態, 並告訴 React狀態改變並該渲染了
+ * * [註]: 不建議直接修改state(無法被攔截判斷修改), 必須間接修改使用setState()告知React該渲染了
+ * 
+ * ? 條件渲染
+ * * 不同於透過狀態直接渲染, 當 React透過狀態中某種"條件"去操作虛擬DOM並執行渲染, 稱做條件渲染
+ * * 使用 aaa?bbb:ccc 運算子或 and/or 運算子進行操作
+ * 
+ * ? setState()的怪異之處
+ * * setState()用於更新state物件, 以及重新渲染(render)
+ * * <注意>
+ * * setState()處在同步的JS中, 會非同步更新state物件, 以及重新渲染
+ * * 原因: 為了避免阻斷同步程式碼, 以及對狀態更新以及渲染做合併處理
+ * * setState()處在非同步的JS中, 會同步執行更新state物件, ...
+ * * 原因: 本身不會阻斷, 並不須做合併處理
+ * * > setState()接受第二個callback引數, 在狀態和DOM更新完時回調
  * 
  * $ key屬性
  * * key屬性作為虛擬DOM中diffing算法的精準判斷關鍵
  * * => 避免重繪重排, 復用, 提高效能
  * * => key的理想值為唯一不變的id
  * * => 若不涉及插入, 中間刪除, 也可設為索引值
+ * 
+ * $ dangerouslySetInnerHTML屬性
+ * * React在預設情況下, 會將標籤中的JS字串轉為純文本(類似textContet)
+ * * 使用dangerouslySetInnerHTML屬性可更改此預設值, 將JS字串轉為HTML代碼(類似innerHTML)
+ * > dangerouslySetInnerHTML={{__html: 要轉換的JS字串}}
+ * * [注]: 很危險! 操作不當會被有心人士跨腳本攻擊!
  */
+
+
 
