@@ -146,7 +146,7 @@
  * * 不同於 Vue, React的聲明式設計並沒有使用底層變數攔截 => 需手動告知 React渲染時機
  * ? state物件, setState()方法
  * * 使用狀態特性(state)儲存狀態(推薦), 並透過 setState()來設定新的狀態, 並告訴 React狀態改變並該渲染了
- * * [註]: 不建議直接修改state(無法被攔截判斷修改), 必須間接修改使用setState()告知React該渲染了
+ * * [註]: 不建議直接修改state(使用無法被攔截判斷修改, 並會影響生命週期), 必須間接修改使用setState()告知React該渲染了
  * 
  * ? 條件渲染
  * * 不同於透過狀態直接渲染, 當 React透過狀態中某種"條件"去操作虛擬DOM並執行渲染, 稱做條件渲染
@@ -243,10 +243,51 @@
  * > <xxx.Provider>: 生產者 - 提供value
  * > <xxx.Cunsuber>: 消費者 - 取得value
  * 
- * ? Redux狀態管理
+ * ? 其他狀態管理方式
+ * * 如: 使用Redux
  * 
  * $ React插槽
  * * React中插槽被視作屬性傳入, 可透過props.children取得
  * * 插槽等同屬性放入JSX, 只是透過較直觀的語法表示
  * * 好處: 復用性, 降低父子通信次數, 更直觀
+ * 
+ * $ 生命週期(類組件)
+ * * 分3大階段: 初始化, 運行中, 銷毀階段
+ * 
+ * ? 初始化階段
+ * * componentWillMount(): 將要掛載組件(僅一次)
+ * * => 通常用於初始化
+ * * [注]: 已不推薦使用(diffing算法的改變, fiber技術導致不安全)
+ * * render(): 正在掛載並渲染
+ * * => 渲染數據
+ * * componentDidMount(): 掛載完畢(僅一次)
+ * * => 通常用於數據請求(ajax), 
+ * * => 訂閱函數調用, 
+ * * => setInterval, 
+ * * => 基於創建完的DOM進行初始化(如BetterScroll)
+ * 
+ * ? 運行中階段
+ * * componentWillUpdate(): 將需要更新組件
+ * * [注]: 已不推薦使用(diffing算法的改變, fiber技術導致不安全)
+ * * render(): 正在更新並渲染
+ * * componentDidUpdate(prevProps, prevState): 更新完畢
+ * * => 更新後想獲取DOM節點
+ * * shouldComponentUpdate(nextProps, nextState): 是否應該更新
+ * * => 阻止更新, 提高效能(避免沒必要的虛擬DOM建立和diffing)
+ * * componentWillReceiveProps(nextProps): 將要收到屬性
+ * * => 最先獲得傅組件傳來的屬性, 並進行操作(如把屬性存入狀態)
+ * * [注]: 已不推薦使用(diffing算法的改變, fiber技術導致不安全)
+ * 
+ * ? 銷毀階段
+ * * componentWillUnmount(): 將要卸載
+ * * => 用於解綁工作, 如計時器, 事件解綁
+ * 
+ * ? 新生命週期
+ * * 新版本React提供了幾種生命週期方法解決舊生命週期會遇到的問題
+ * * static getDerivedStateFromProps(): 
+ * * => 用於將屬性轉為狀態, 整合過去須使用多個生命週期達成的效果, 並解決componentWillReceiveProps()的不安全問題
+ * * => 回傳值為修改過的狀態
+ * * getSnapShotBeforeUpdate(): 
+ * * => 在即將更新前做最後一次操作, 不同於componentWillUpdate(), 除了解決不安全問題之外, 將生命週期移至render()之後, 緊黏componentDidUpdate(), 解決原先時間點間隔太長的問題(不準)
+ * * => 回傳值為傳給componentDidUpdate()的第三引數
  */
