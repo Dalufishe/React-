@@ -244,7 +244,7 @@
  * > <xxx.Cunsuber>: 消費者 - 取得value
  * 
  * ? 其他狀態管理方式
- * * 如: 使用Redux
+ * * 如: 使用Redux, useReducer()
  * 
  * $ React插槽
  * * React中插槽被視作屬性傳入, 可透過props.children取得
@@ -290,4 +290,67 @@
  * * getSnapShotBeforeUpdate(): 
  * * => 在即將更新前做最後一次操作, 不同於componentWillUpdate(), 除了解決不安全問題之外, 將生命週期移至render()之後, 緊黏componentDidUpdate(), 解決原先時間點間隔太長的問題(不準)
  * * => 回傳值為傳給componentDidUpdate()的第三引數
- */
+ * 
+ * $ React性能優化
+ * * shouldComonentUpdate():
+ * * => 需"手動"判斷舊狀態/屬性和新狀態/屬性以進行優化
+ * * PureComponent取代Component 
+ * * => 自動判斷並優化
+ * * [注]: state或 props一直改變 => 每次都判斷反而讓費時間
+ * 
+ * $ React Hooks
+ * ? 功能
+ * * 使函式組件擁有類組件某些性質或功能
+ * * => useState()達成有狀態組件, useEffect()模擬生命週期
+ * * 某些操作從類組件移至函式組件效果不彰, 可使成效達標或突破
+ * * => useRef(), useCallback()等
+ * * 單純優化, 簡化某些操作
+ * * => useContext()等
+ * * 和類組件無關, 完全新的功能
+ * * => useReducer()等
+ * 
+ * ? why hooks?
+ * * 高階組件為了復用, 導致代碼複雜
+ * * 生命週期的複雜
+ * * 原本使用function組件, 後來因需要狀態又改為class, 成本高
+ * 
+ * ? useState()方法 - 狀態
+ * * 使用 useState()方法使函式組件擁有內部狀態(就像類組件的state和setState()一樣)
+ * * => useState(value)傳入一個值, 作為該狀態的初始值
+ * * => 解構 useState()回傳的陣列, 可取得狀態及設定狀態的方法
+ * 
+ * ? useEffect()方法 - 副作用
+ * * 使用 useEffect()方法使函式組件達成類似生命週期函式可達成的效果(仍沒有生命週期函式)
+ * * => useEffect(func, array)傳入函式及陣列, 作為副作用及依賴
+ * * => 傳入空數組 []: 不依賴任何人, 只在組件渲染完執行一次, 模擬cdm
+ * * => 傳入依賴 [xxx]: 除了執行第一次, 之後依賴更新(並渲染完)也會執行, 模擬cdu
+ * * => 設定return回調: 組件銷毀回調, 模擬cdum (若有設定依賴, 則依賴更新時也會回調)
+ * * [注]: useLayoutEffect() 和 useEffect() 區別: 
+ * * => useLayoutEffect()在DOM完成更新時同步執行, 更加模擬cdm/cdu, 但可能阻塞渲染
+ * * useEffect()在渲染完畢執行, 不會阻塞渲染, 但可能造成 頁面抖動
+ * 
+ * ? useCallback()方法 - 定義函式
+ * * useCallback()可將函式記憶, 避免重複定義
+ * * => useCallback(func, array)傳入函式及陣列, 作為函式定義及依賴
+ * * => 傳入依賴在依賴改變時, 函式會重複定義, 避免使用過去記憶的依賴
+ * 
+ * ? useMemo()方法 - 定義函式+回傳
+ * * useCallback(fn, input) 等同於 useMemo(() => fn, input)
+ * * => useCallback()返回函式, useMemo()返回函式調用的結果
+ * 
+ * ? useRef()方法 - 建立參考或記憶值
+ * * useRef()用於建立參考, 等同於類組件中的React.createRef()
+ * * useRef(value)還能夠作為記憶變數使用
+ * 
+ * ? useContext()方法 - 簡化狀態樹傳參
+ * * useContext()用於狀態樹傳參, 可大幅降低原本的複雜度
+ * * => useContext(ReactContext物件)回傳 value
+ * 
+ * ? useReducer()方法 - 外部狀態管理
+ * * 繼承Redux分離式狀態管理理念, Hooks提供了useReducer()在外部管理狀態
+ * * useReducer(reducer, initialState)用法:
+ * * => 解構useReducer()回傳 state和 dispatch
+ * * => state: 狀態物件, dispatch: 發布通知
+ * * => reducer: 外部處理函式, initialState: 初始狀態
+*/
+
