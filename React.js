@@ -352,5 +352,61 @@
  * * => 解構useReducer()回傳 state和 dispatch
  * * => state: 狀態物件, dispatch: 發布通知
  * * => reducer: 外部處理函式, initialState: 初始狀態
+ * 
+ * $ React 路由
+ * * 路由: 根據不同的url, 載入不同的頁面
+ * * 使用React-Router庫可輕易達成此效果
+ * > npm i react-router-dom@5 // 下載庫
+ * > imort {HashRouter, Route} from "react-router-dom" //導入庫
+ * * React-Router庫透過"組件"來操作"路由"
+ * 
+ * ? 建立路由器
+ * * 建立一個 Router, 如 <HashRouter>
+ * * => 在 url中添加 \#
+ * 
+ * ? 一級路由級多級路由
+ * * <Route path="" component={}> 可以建立路由
+ * * => 在 path屬性中指定路徑, component屬性中指定頁面組件
+ * * => 若單層路徑則為一級路由, 多層則為多級路由
+ * * => 預設情況路由為模糊匹配, 加上exact屬性始之為精準匹配
+ * 
+ * ? 路由重定向
+ * * 在輸入url後(或重整), 能夠從"路由器"跳至"路由"稱為路由重定向
+ * > import {Redirect} from "react-router-dom"
+ * * 使用 <Redirect from="" to=""> 操作重定向
+ * * => 重定向須寫在路由最下方, 當上方都執行完畢才執行重定向
+ * * => 例外: 路由重定向在手動載入路由和路由器(輸入對)時不運作
+ * * 預設情況路由重定向會在上方路由執行完後執行, 會導致重整時跳回重定向頁面
+ * * => 使用 <Switch> 避免此情況
+ * * 預設情況路由重定向為模糊匹配
+ * * => 加上exact屬性始之為精準匹配
+ * 
+ * ? 嵌套路由
+ * * 在組件中的組件有自己的路由設置, 為嵌套路由
+ * * [注]: 二級(以上)路由僅為路徑上的從屬關系, 和組件從屬關係無關
+ * 
+ * ? 路由導航
+ * * 透過按鈕操作等方式間接切換路由, 而非直接透過url
+ * * React-router提供聲明式及編程式操作路由導航
+ * * 聲明式:
+ * * => <NavLink>組件操作聲明式導航
+ * * => to屬性: 導航到的url
+ * * => className屬性: <NavLink>底層的<a>元素屬性名稱
+ * * => activeClassName屬性: 當前url對應的<NavLink>目標配對類別名稱
+ * * 編程式:
+ * * => props.history.push()或使用 useHistory()
+ * * => 引數傳入路徑, 操作編程式導航
+ * * [注]: 所有使用react-router的路徑皆從路由器後開始
+ * 
+ * ? 動態路由
+ * * 有時候沒辦法剛開始就確定路徑並配置路由(可能會變或者量多), 則必須依照當前情況"傳參"給組件進行相對應操作, 動態路由則為其中一種方案
+ * * <Route path="/xxx/:yyy" component={}>: 
+ * * => 使用 ":" 佔位符告知React-Router此路由為動態路由
+ * * => 透過組件的props.match.params.yyy取得當前佔位符後的動態路由
+ * * 不使用動態路由的其他傳參方式:
+ * * => props.history.push({pathname: "xxx", query: {yyy: zzz}})並透過props.location.query.yyy取得
+ * * => props.history.push({pathname: "xxx", state: {yyy: zzz}})並透過props.location.state.yyy取得
+ * * [注]: 後兩者傳參方式是透過導航行為傳遞參數內存並取用, 不同於動態路由透過路徑取得參數, 若使用url張貼會出現錯誤(隱患, 不推薦使用)
+ * 
 */
 
