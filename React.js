@@ -324,7 +324,7 @@
  * * => useEffect(func, array)傳入函式及陣列, 作為副作用及依賴
  * * => 傳入空數組 []: 不依賴任何人, 只在組件渲染完執行一次, 模擬cdm
  * * => 傳入依賴 [xxx]: 除了執行第一次, 之後依賴更新(並渲染完)也會執行, 模擬cdu
- * * => 設定return回調: 組件銷毀回調, 模擬cdum (若有設定依賴, 則依賴更新時也會回調)
+ * * => 設定return回調: 組件銷毀回調, 模擬cwun (若有設定依賴, 則依賴更新時也會回調)
  * * [注]: useLayoutEffect() 和 useEffect() 區別: 
  * * => useLayoutEffect()在DOM完成更新時同步執行, 更加模擬cdm/cdu, 但可能阻塞渲染
  * * useEffect()在渲染完畢執行, 不會阻塞渲染, 但可能造成 頁面抖動
@@ -408,5 +408,114 @@
  * * => props.history.push({pathname: "xxx", state: {yyy: zzz}})並透過props.location.state.yyy取得
  * * [注]: 後兩者傳參方式是透過導航行為傳遞參數內存並取用, 不同於動態路由透過路徑取得參數, 若使用url張貼會出現錯誤(隱患, 不推薦使用)
  * 
+ * ? 路由攔截
+ * * 跳轉到路由時, 若不符合某些條件, 則進行某些操作
+ * * <Route path="xxx" render={()=>{}}>
+ * * 我們通常在做路由攔截使用render屬性取代component屬性
+ * * => 傳入回調函式, 支援更複雜的邏輯計算已經組件的細節輸入
+ * * => 達成原本component屬性無法達到的如"重定向"等功能
+ * 
+ * ? 路由模式
+ * * <HashRouter>:
+ * * => 路由器為井號(#), 並且為客戶端刷新
+ * * <BrowserRouter>: 
+ * * => 路由器不顯示, 並且為伺服端刷新
+ * 
+ * ? withRouter
+ * * 當我們使用<Route path="/xxx" component={AAA}>
+ * * => React-Router將 AAA組件作為 Route組件的子組件, 故可取用Route組件傳入的 props.history, props.match等屬性
+ * * 某些情況在同個路由卻不會被視為Route組件的子組件(如使用Router render屬性, 組件的子組件等)仍需要Route組件傳遞的props, 除了手動傳遞外, React-Router提供了withRouter函式將組件轉為擁有原本Router組件會傳遞屬性的高階組件
+ * 
+ * $ 反向代理
+ * * 某些網站有嚴格的跨域限制, 旨在解決跨域限制的方案
+ * * 原理: 跨域限制為瀏覽器(客戶端)限制的, 伺服器與伺服器間無跨域問題, 透過本地伺服器請求目標伺服器取得資料, 再由瀏覽器請求本地伺服器(同源)取得資料, 為反向代理.
+ * 
+ * ? http-proxy-middleware 套件
+ * > npm i http-proxy-middleware
+ * > cd src -> 創建 setupProxy.js JS檔案
+// > const { createProxyMiddleware } = require("http-proxy-middleware");
+//  module.exports = function (app) {
+//     app.use(
+//         '/api',
+//         createProxyMiddleware({
+//             target: 'https://xxxxxxxxx',
+//             changeOrigin: true,
+//         })
+//     )
+// }
+ * > 重啟伺服器
+ *  
+ * $ CssModule
+ * * 單頁面多個css恐造成撞名問題
+ * * CssModule解決了撞名問題, 將css檔案中恐撞名的選擇器(class, id)名稱轉為獨一無二的名稱
+ * 
+ * $ Flux(架構) & Redux(第三方庫) 做狀態管理
+ * ? Flux
+ * * Flux是一種架構思想(和MVC是同一類東西), 利用單向數據流來組合視圖組件, 實現外部狀態管理, 解決複雜的非父子通信問題
+ * * Flux模式:
+ * * 1. 用戶訪問 View -> 
+ * * 2. View建立 Action -> 
+ * * 3. Dispatcher收到 Action -> 
+ * * 4. Dispatch Action ->
+ * * 5. Store進行更新 -> 
+ * * 6. View更新頁面
+ * 
+ * ? Redux
+ * * Redux是實現 Flux架構-外部狀態管理 的第三方庫, 基於純JS
+ * * Redux工作流:
+ * * 1. 建立 Action物件 -> 
+ * * // const action = {...};
+ * * 2. 透過 dispatch方法 將Action物件 發送到 Store物件 ->
+ * * // store.dispatch(action)
+ * * 3. Store物件 使用 reducer 進行操作, 更改 State ->
+ * * // createStore(reducer)建立store物件 // store使用reducer 
+ * * 4. subscribe方法註冊的函式 使用 State
+ * * // store.subscribe(()=>{store.getState() ...})
+ * * // 取消訂閱: store.subsrribe()回傳取消訂閱函數, 調閱取消訂閱
+ * 
+ * ? Redux搭配React:
+ * * => 將 React中狀態(state物件)的搭配 Redux狀態(純物件)使用
+ * 
+ * ? 使用Redux三大原則
+ * * [注]: 此處 state指 redux狀態
+ * * 1. state以"單一物件"存儲在store物件中
+ * * 2. state是"唯讀的", 不能直接去改他
+ * * 3. 使用"純函數"(1.對外界沒有副作用, 2.同樣的輸入得到同樣的輸出) reducer執行 state更新
+ * 
+ * ? Reducer擴展
+ * * 若不同的 action 處理的屬性沒有聯繫, 可將 Reducer拆分, 最終在合併
+ * 
+ * ? Redux非同步
+ * * Redux中, action僅是攜帶數據的js物件, action creator返回的值為action物件, 然後通過dispatch()進行分發. 同步一切都很完美, 但redux無法處理非同步的情況.
+ * * [注]: 為何不在action creator之外使用非同步? 答: 在action creator之外已牴觸Flux架構的視圖獨立原則, 應將數據處理邏輯獨立於視圖組件外部
+ * * => Redux無法處理非同步, 需使用"中間件"已達成非同步
+ * * 載入中間件外掛:
+ * * => 創建store同時應用中間鍵
+ * > const store = createStore(reducer, applyMiddleware(xxx))
+ * * redux-thunk
+ * * => store.dispatch()參數可以是個function(取代原本action物件)
+ * * => 此function中的dispatch引數調用 -> 建立action
+ * * redux-promise
+ * * => store.dispatch()參數可以是個promise(取代原本action物件)
+ * * => 此promise中的履行值 -> 建立action
+ * 
+ * ? Redux開發者工具
+ * * redux-dev-tool配置
+// const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+// const store = createStore(reducer, composeEnhancers(applyMiddleware(xxx)));
+ * 
+ * ? React-Redux
+ * * Redux僅基於原生JS, 搭配React操作略顯繁複
+ * * => 將Redux-state設定成state物件 : 麻煩
+ * * => 訂閱後的回條函式須取消訂閱: 麻煩
+ * * React-Redux結合部分React功能, 實現簡化
+ * * => Provider組件: 提供store
+ * * => connect函數: 高階組件轉換函數, 將原先分發, 訂閱/取消訂閱的集合到此高階組件之中
+ * * 原本的subscribe + getState函數: 
+ * * => store.subscribe(()=>{getState()...}) => 轉變成
+ * * => connent(()=>{state} // mapStateToProps)(組件)
+ * * 原本的dispatch函數:
+ * * => store.dispatch(actionCreator) => 轉變成
+ * * => connent(null, {actionCreator} // mapDispatchToProps)(組件)
 */
 
